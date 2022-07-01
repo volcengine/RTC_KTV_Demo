@@ -10,7 +10,7 @@
 │  ├─ Development Pods  
 │  │  ├─ Core               // 通用组件
 │  │  ├─ Login              // 登录模块 
-│  │  ├─ KTVDemo            // 语音沙龙场景源码 
+│  │  ├─ KTVDemo            // 场景源码 
 │  ├─ Pods                  
 │  │  ├─ VolcEngineRTC      // RTC SDK
 
