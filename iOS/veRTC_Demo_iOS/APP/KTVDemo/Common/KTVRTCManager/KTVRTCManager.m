@@ -3,11 +3,13 @@
 #import "AlertActionManager.h"
 #import "SystemAuthority.h"
 
-@interface KTVRTCManager () <ByteRTCEngineDelegate>
+@interface KTVRTCManager () <ByteRTCVideoDelegate>
 
 @property (nonatomic, strong) KTVRoomParamInfoModel *paramInfoModel;
 @property (nonatomic, assign) int audioMixingID;
 @property (nonatomic, assign) BOOL isAudioMixing;
+@property (nonatomic, assign) BOOL isEnableAudioCapture;
+@property (nonatomic, assign) ByteRTCAudioRoute currentAudioRoute;
 
 @end
 
@@ -26,14 +28,13 @@
 
 - (void)configeRTCEngine {
     [self.rtcEngineKit setAudioScenario:ByteRTCAudioScenarioMusic];
-    [self.rtcEngineKit setUserVisibility:NO];
-    self.paramInfoModel.receivedLossRate = @"0";
-    self.paramInfoModel.sendLossRate = @"0";
+    [self.rtcRoom setUserVisibility:NO];
     self.paramInfoModel.rtt = @"0";
     _audioMixingID = 3001;
 }
 
 - (void)joinChannelWithToken:(NSString *)token roomID:(NSString *)roomID uid:(NSString *)uid {
+    self.isEnableAudioCapture = NO;
     //关闭 本地音频/视频采集
     //Turn on/off local audio capture
     [self.rtcEngineKit stopAudioCapture];
@@ -41,65 +42,62 @@
 
     //设置音频路由模式，YES 扬声器/NO 听筒
     //Set the audio routing mode, YES speaker/NO earpiece
-    [self.rtcEngineKit setAudioPlaybackDevice:ByteRTCAudioPlaybackDeviceSpeakerphone];
-    
+    [self.rtcEngineKit setDefaultAudioRoute:ByteRTCAudioRouteSpeakerphone];
+
     //开启/关闭发言者音量键控
     //Turn on/off speaker volume keying
-    [self.rtcEngineKit setAudioVolumeIndicationInterval:300];
-
+    ByteRTCAudioPropertiesConfig *audioPropertiesConfig = [[ByteRTCAudioPropertiesConfig alloc] init];
+    audioPropertiesConfig.interval = 300;
+    [self.rtcEngineKit enableAudioPropertiesReport:audioPropertiesConfig];
+    
     //加入房间，开始连麦,需要申请AppId和Token
     //Join the room, start connecting the microphone, you need to apply for AppId and Token
     ByteRTCUserInfo *userInfo = [[ByteRTCUserInfo alloc] init];
     userInfo.userId = uid;
-    
     ByteRTCRoomConfig *config = [[ByteRTCRoomConfig alloc] init];
-    config.profile = ByteRTCRoomProfileLiveBroadcasting;
+    config.profile = ByteRTCRoomProfileKTV;
     config.isAutoPublish = YES;
     config.isAutoSubscribeAudio = YES;
-    
-    [self.rtcEngineKit joinRoomByKey:token
-                        roomId:roomID
-                      userInfo:userInfo
-                 rtcRoomConfig:config];
+    self.rtcRoom = [self.rtcEngineKit createRTCRoom:roomID];
+    self.rtcRoom.delegate = self;
+    [self.rtcRoom joinRoomByToken:token userInfo:userInfo roomConfig:config];
 }
 
-- (NSString *_Nullable)getSdkVersion {
-    return [ByteRTCEngineKit getSdkVersion];
+- (BOOL)canEarMonitor {
+    return _currentAudioRoute == ByteRTCAudioRouteHeadset || _currentAudioRoute == ByteRTCAudioRouteHeadsetUSB;
 }
 
 #pragma mark - rtc method
 
 - (void)enableLocalAudio:(BOOL)enable {
-    //开启/关闭 本地音频采集
-    //Turn on/off local audio capture
-    if (enable) {
-        [self.rtcEngineKit setUserVisibility:YES];
-    } else {
-        [self.rtcEngineKit setUserVisibility:NO];
-        self.paramInfoModel.receivedLossRate = @"0";
-        self.paramInfoModel.sendLossRate = @"0";
-        self.paramInfoModel.rtt = @"0";
-    }
-    
     if (enable) {
         [SystemAuthority authorizationStatusWithType:AuthorizationTypeAudio
                                                block:^(BOOL isAuthorize) {
             if (isAuthorize) {
                 NSLog(@"KTV RTC Manager == startAudioCapture");
+                [self.rtcRoom setUserVisibility:YES];
+                [self.rtcRoom publishStream:ByteRTCMediaStreamTypeAudio];
                 [self.rtcEngineKit startAudioCapture];
-                [self.rtcEngineKit muteLocalAudio:ByteRTCMuteStateOff];
+                self.isEnableAudioCapture = YES;
             }
         }];
     } else {
         NSLog(@"KTV RTC Manager == stopAudioCapture");
+        [self.rtcRoom setUserVisibility:NO];
+        self.isEnableAudioCapture = NO;
         [self.rtcEngineKit stopAudioCapture];
+        self.paramInfoModel.rtt = @"0";
     }
 }
 
 - (void)muteLocalAudio:(BOOL)mute {
     //开启/关闭 本地音频采集
     //Turn on/off local audio capture
-    [self.rtcEngineKit muteLocalAudio:mute];
+    if (mute) {
+        [self.rtcRoom unpublishStream:ByteRTCMediaStreamTypeAudio];
+    } else {
+        [self.rtcRoom publishStream:ByteRTCMediaStreamTypeAudio];
+    }
 }
 
 - (void)leaveChannel {
@@ -114,13 +112,7 @@
     
     // 离开频道
     // Leave the channel
-    [self.rtcEngineKit leaveRoom];
-}
-
-- (void)destroy {
-    [ByteRTCEngineKit destroy];
-    [self.rtcEngineKit destroyEngine];
-    self.rtcEngineKit = nil;
+    [self.rtcRoom leaveRoom];
 }
 
 #pragma mark - Singing Music Method
@@ -129,6 +121,9 @@
     if (IsEmptyStr(filePath)) {
         return;
     }
+    
+    [self enableEarMonitor:NO];
+    
     self.isAudioMixing = YES;
     ByteRTCAudioMixingManager *audioMixingManager = [self.rtcEngineKit getAudioMixingManager];
     
@@ -204,8 +199,7 @@
     [audioMixingManager setAudioMixingVolume:_audioMixingID volume:(int)volume type:ByteRTCAudioMixingTypePlayoutAndPublish];
 }
 
-- (void)rtcEngine:(ByteRTCEngineKit *)engine onStreamSyncInfoReceived:(ByteRTCRemoteStreamKey *)remoteStreamKey streamType:(ByteRTCSyncInfoStreamType)streamType data:(NSData *)data {
-    // 切歌够开始本地播放依然能够收到回调导致歌词闪烁
+- (void)rtcEngine:(ByteRTCVideo *)engine onStreamSyncInfoReceived:(ByteRTCRemoteStreamKey *)remoteStreamKey streamType:(ByteRTCSyncInfoStreamType)streamType data:(NSData *)data {
     // Cut the song enough to start local playback and still be able to receive callbacks causing the lyrics to flicker
     if (self.isAudioMixing) {
         return;
@@ -218,7 +212,7 @@
     }
 }
 
-- (void)rtcEngine:(ByteRTCEngineKit *)engine onAudioMixingStateChanged:(NSInteger)id state:(ByteRTCAudioMixingState)state error:(ByteRTCAudioMixingError)error {
+- (void)rtcEngine:(ByteRTCVideo *)engine onAudioMixingStateChanged:(NSInteger)mixId state:(ByteRTCAudioMixingState)state error:(ByteRTCAudioMixingError)error {
     if (state == ByteRTCAudioMixingStateFinished) {
         dispatch_queue_async_safe(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(KTVRTCManager:songEnds:)]) {
@@ -228,43 +222,62 @@
     }
 }
 
-- (void)rtcEngine:(ByteRTCEngineKit * _Nonnull)engine
-    onAudioMixingPlayingProgress:(NSInteger)id
-    progress:(int64_t) progress {
+- (void)rtcEngine:(ByteRTCVideo *)engine onAudioMixingPlayingProgress:(NSInteger)mixId progress:(int64_t)progress {
         if ([self.delegate respondsToSelector:@selector(KTVRTCManager:onAudioMixingPlayingProgress:)]) {
             [self.delegate KTVRTCManager:self onAudioMixingPlayingProgress:progress];
         }
 }
 
 
-#pragma mark - ByteRTCEngineDelegate
+#pragma mark - ByteRTCVideoDelegate
 
-- (void)rtcEngine:(ByteRTCEngineKit *_Nonnull)engine onLocalStreamStats:(const ByteRTCLocalStreamStats * _Nonnull)stats {
-    if (stats.audio_stats.audioLossRate > 0) {
-        self.paramInfoModel.sendLossRate = [NSString stringWithFormat:@"%.0f",stats.audio_stats.audioLossRate];
+- (void)rtcRoom:(ByteRTCRoom *)rtcRoom onNetworkQuality:(ByteRTCNetworkQualityStats *)localQuality remoteQualities:(NSArray<ByteRTCNetworkQualityStats *> *)remoteQualities {
+    if (self.isEnableAudioCapture) {
+        // 开启音频采集的用户，数据传输往返时延。
+        // For users who enable audio capture, the round-trip delay of data transmission.
+        self.paramInfoModel.rtt = [NSString stringWithFormat:@"%.0ld",(long)localQuality.rtt];
+    } else {
+        // 关闭音频采集的用户，数据传输往返时延。
+        // For users who turn off audio capture, the round-trip delay of data transmission.
+        self.paramInfoModel.rtt = [NSString stringWithFormat:@"%.0ld",(long)remoteQualities.firstObject.rtt];
     }
-    if (stats.audio_stats.rtt > 0) {
-        self.paramInfoModel.rtt = [NSString stringWithFormat:@"%.0ld",(long)stats.audio_stats.rtt];
-    }
+    // 下行网络质量评分
+    // Downlink network quality score
+    self.paramInfoModel.rxQuality = localQuality.rxQuality;
+    
+    // 上行网络质量评分
+    // Uplink network quality score
+    self.paramInfoModel.txQuality = localQuality.txQuality;
     [self updateRoomParamInfoModel];
 }
 
-- (void)rtcEngine:(ByteRTCEngineKit * _Nonnull)engine onRemoteStreamStats:(const ByteRTCRemoteStreamStats * _Nonnull)stats {
-    if (stats.audio_stats.audioLossRate > 0) {
-        self.paramInfoModel.receivedLossRate = [NSString stringWithFormat:@"%.0f",stats.audio_stats.audioLossRate];
-    }
-    [self updateRoomParamInfoModel];
-}
-
-- (void)rtcEngine:(ByteRTCEngineKit * _Nonnull)engine onAudioVolumeIndication:(NSArray<ByteRTCAudioVolumeInfo *> * _Nonnull)speakers totalRemoteVolume:(NSInteger)totalRemoteVolume {
+- (void)rtcEngine:(ByteRTCVideo *)engine onRemoteAudioPropertiesReport:(NSArray<ByteRTCRemoteAudioPropertiesInfo *> *)audioPropertiesInfos totalRemoteVolume:(NSInteger)totalRemoteVolume {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
-    for (int i = 0; i < speakers.count; i++) {
-        ByteRTCAudioVolumeInfo *model = speakers[i];
-        [dic setValue:@(model.linearVolume) forKey:model.uid];
+    for (int i = 0; i < audioPropertiesInfos.count; i++) {
+        ByteRTCRemoteAudioPropertiesInfo *model = audioPropertiesInfos[i];
+        [dic setValue:@(model.audioPropertiesInfo.linearVolume) forKey:model.streamKey.userId];
     }
     if ([self.delegate respondsToSelector:@selector(KTVRTCManager:reportAllAudioVolume:)]) {
         [self.delegate KTVRTCManager:self reportAllAudioVolume:dic];
     }
+}
+
+/**
+ * @type callback
+ * @region 音频事件回调
+ * @author dixing
+ * @brief 音频播放路由变化时，收到该回调。
+ * @param device 新的音频播放路由，详见 ByteRTCAudioRouteDevice{@link #ByteRTCAudioRouteDevice}
+ * @notes 关于音频路由设置，详见 setAudioRoute:{@link #ByteRTCEngineKit#setAudioRoute:}。
+ */
+- (void)rtcEngine:(ByteRTCVideo *)engine onAudioRouteChanged:(ByteRTCAudioRoute)device {
+    _currentAudioRoute = device;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(KTVRTCManagerOnAudioRouteChanged:)]) {
+            [self.delegate KTVRTCManagerOnAudioRouteChanged:self];
+        }
+    });
 }
 
 #pragma mark - Private Action

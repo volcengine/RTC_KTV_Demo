@@ -2,8 +2,8 @@
 //  KTVRoomViewController.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import "KTVRoomViewController.h"
@@ -12,27 +12,27 @@
 #import "KTVHostAvatarView.h"
 #import "KTVRoomBottomView.h"
 #import "KTVPeopleNumView.h"
-#import "KTVSeatCompoments.h"
-#import "KTVMusicCompoments.h"
-#import "KTVTextInputCompoments.h"
-#import "KTVRoomUserListCompoments.h"
-#import "KTVIMCompoments.h"
+#import "KTVSeatComponent.h"
+#import "KTVMusicComponent.h"
+#import "KTVTextInputComponent.h"
+#import "KTVRoomUserListComponent.h"
+#import "KTVIMComponent.h"
 #import "KTVPickSongComponent.h"
 #import "KTVPickSongManager.h"
 #import "KTVRTCManager.h"
 #import "KTVRTMManager.h"
 #import "NetworkingTool.h"
 
-@interface KTVRoomViewController () <KTVRoomBottomViewDelegate, KTVRTCManagerDelegate, KTVSeatDelegate, MusicCompomentsDelegate, KTVPickSongComponentDelegate>
+@interface KTVRoomViewController () <KTVRoomBottomViewDelegate, KTVRTCManagerDelegate, KTVSeatDelegate, MusicComponentDelegate, KTVPickSongComponentDelegate>
 
 @property (nonatomic, strong) KTVStaticView *staticView;
 @property (nonatomic, strong) KTVHostAvatarView *hostAvatarView;
 @property (nonatomic, strong) KTVRoomBottomView *bottomView;
-@property (nonatomic, strong) KTVMusicCompoments *musicCompoments;
-@property (nonatomic, strong) KTVTextInputCompoments *textInputCompoments;
-@property (nonatomic, strong) KTVRoomUserListCompoments *userListCompoments;
-@property (nonatomic, strong) KTVIMCompoments *imCompoments;
-@property (nonatomic, strong) KTVSeatCompoments *seatCompoments;
+@property (nonatomic, strong) KTVMusicComponent *musicComponent;
+@property (nonatomic, strong) KTVTextInputComponent *textInputComponent;
+@property (nonatomic, strong) KTVRoomUserListComponent *userListComponent;
+@property (nonatomic, strong) KTVIMComponent *imComponent;
+@property (nonatomic, strong) KTVSeatComponent *seatComponent;
 @property (nonatomic, strong) KTVPickSongComponent *pickSongComponent;
 @property (nonatomic, strong) KTVRoomModel *roomModel;
 @property (nonatomic, strong) KTVUserModel *hostUserModel;
@@ -141,7 +141,7 @@
 
 - (void)clearRedNotification {
     [self.bottomView updateButtonStatus:KTVRoomBottomStatusPhone isRed:NO];
-    [self.userListCompoments updateWithRed:NO];
+    [self.userListComponent updateWithRed:NO];
 }
 
 #pragma mark - SocketControl
@@ -152,9 +152,9 @@
     KTVIMModel *model = [[KTVIMModel alloc] init];
     model.userModel = userModel;
     model.isJoin = YES;
-    [self.imCompoments addIM:model];
+    [self.imComponent addIM:model];
     [self.staticView updatePeopleNum:count];
-    [self.userListCompoments update];
+    [self.userListComponent update];
 }
 
 - (void)receivedLeaveUser:(KTVUserModel *)userModel
@@ -162,9 +162,9 @@
     KTVIMModel *model = [[KTVIMModel alloc] init];
     model.userModel = userModel;
     model.isJoin = NO;
-    [self.imCompoments addIM:model];
+    [self.imComponent addIM:model];
     [self.staticView updatePeopleNum:count];
-    [self.userListCompoments update];
+    [self.userListComponent update];
 }
 
 - (void)receivedFinishLive:(NSInteger)type roomID:(NSString *)roomID {
@@ -173,13 +173,13 @@
     }
     [self hangUp:NO];
     if (type == 3) {
-        [[ToastComponents shareToastComponents] showWithMessage:@"直播间内容违规，直播间已被关闭" delay:0.8];
+        [[ToastComponent shareToastComponent] showWithMessage:@"直播间内容违规，直播间已被关闭" delay:0.8];
     }
     else if (type == 2 && [self isHost]) {
-        [[ToastComponents shareToastComponents] showWithMessage:@"本次体验时间已超过20mins" delay:0.8];
+        [[ToastComponent shareToastComponent] showWithMessage:@"本次体验时间已超过20mins" delay:0.8];
     } else {
         if (![self isHost]) {
-            [[ToastComponents shareToastComponents] showWithMessage:@"直播间已结束" delay:0.8];
+            [[ToastComponent shareToastComponent] showWithMessage:@"直播间已结束" delay:0.8];
         }
     }
 }
@@ -190,38 +190,38 @@
     seatModel.status = 1;
     seatModel.userModel = userModel;
     seatModel.index = seatID.integerValue;
-    [self.seatCompoments addSeatModel:seatModel];
-    [self.userListCompoments update];
-    if ([userModel.uid isEqualToString:[LocalUserComponents userModel].uid]) {
+    [self.seatComponent addSeatModel:seatModel];
+    [self.userListComponent update];
+    if ([userModel.uid isEqualToString:[LocalUserComponent userModel].uid]) {
         [self.bottomView updateBottomLists:userModel];
         // RTC Start Audio Capture
         [[KTVRTCManager shareRtc] enableLocalAudio:YES];
-        [[ToastComponents shareToastComponents] showWithMessage:@"你已上麦"];
-        [self.musicCompoments updateUserModel:userModel];
+        [[ToastComponent shareToastComponent] showWithMessage:@"你已上麦"];
+        [self.musicComponent updateUserModel:userModel];
     }
     
     //IM
     KTVIMModel *model = [[KTVIMModel alloc] init];
     NSString *message = [NSString stringWithFormat:@"%@已上麦",userModel.name];
     model.message = message;
-    [self.imCompoments addIM:model];
+    [self.imComponent addIM:model];
 }
 
 - (void)receivedLeaveInteractWithUser:(KTVUserModel *)userModel
                                seatID:(NSString *)seatID
                                  type:(NSInteger)type {
-    [self.seatCompoments removeUserModel:userModel];
-    [self.userListCompoments update];
-    if ([userModel.uid isEqualToString:[LocalUserComponents userModel].uid]) {
+    [self.seatComponent removeUserModel:userModel];
+    [self.userListComponent update];
+    if ([userModel.uid isEqualToString:[LocalUserComponent userModel].uid]) {
         [self.bottomView updateBottomLists:userModel];
         // RTC Stop Audio Capture
         [[KTVRTCManager shareRtc] enableLocalAudio:NO];
-        [self.musicCompoments updateUserModel:userModel];
+        [self.musicComponent updateUserModel:userModel];
         
         if (type == 1) {
-            [[ToastComponents shareToastComponents] showWithMessage:@"你已被主播移出麦位"];
+            [[ToastComponent shareToastComponent] showWithMessage:@"你已被主播移出麦位"];
         } else if (type == 2) {
-            [[ToastComponents shareToastComponents] showWithMessage:@"你已下麦"];
+            [[ToastComponent shareToastComponent] showWithMessage:@"你已下麦"];
         }
     }
     
@@ -229,7 +229,7 @@
     KTVIMModel *model = [[KTVIMModel alloc] init];
     NSString *message = [NSString stringWithFormat:@"%@已下麦",userModel.name];
     model.message = message;
-    [self.imCompoments addIM:model];
+    [self.imComponent addIM:model];
 }
 
 - (void)receivedSeatStatusChange:(NSString *)seatID
@@ -238,13 +238,13 @@
     seatModel.status = type;
     seatModel.userModel = nil;
     seatModel.index = seatID.integerValue;
-    [self.seatCompoments updateSeatModel:seatModel];
+    [self.seatComponent updateSeatModel:seatModel];
 }
 
 - (void)receivedMediaStatusChangeWithUser:(KTVUserModel *)userModel
                                    seatID:(NSString *)seatID
                                       mic:(NSInteger)mic {
-    if ([userModel.uid isEqualToString:[LocalUserComponents userModel].uid]) {
+    if ([userModel.uid isEqualToString:[LocalUserComponent userModel].uid]) {
         [self.bottomView updateButtonStatus:KTVRoomBottomStatusLocalMic
                                    isSelect:!mic];
     }
@@ -252,11 +252,11 @@
     seatModel.status = 1;
     seatModel.userModel = userModel;
     seatModel.index = seatID.integerValue;
-    [self.seatCompoments updateSeatModel:seatModel];
+    [self.seatComponent updateSeatModel:seatModel];
     if ([userModel.uid isEqualToString:self.roomModel.hostUid]) {
         [self.hostAvatarView updateHostMic:mic];
     }
-    if ([userModel.uid isEqualToString:[LocalUserComponents userModel].uid]) {
+    if ([userModel.uid isEqualToString:[LocalUserComponent userModel].uid]) {
         // RTC Mute/Unmute Audio Capture
         [[KTVRTCManager shareRtc] muteLocalAudio:!mic];
     }
@@ -264,14 +264,14 @@
 
 - (void)receivedMessageWithUser:(KTVUserModel *)userModel
                         message:(NSString *)message {
-    if (![userModel.uid isEqualToString:[LocalUserComponents userModel].uid]) {
+    if (![userModel.uid isEqualToString:[LocalUserComponent userModel].uid]) {
         KTVIMModel *model = [[KTVIMModel alloc] init];
         NSString *imMessage = [NSString stringWithFormat:@"%@：%@",
                                userModel.name,
                                message];
         model.userModel = userModel;
         model.message = imMessage;
-        [self.imCompoments addIM:model];
+        [self.imComponent addIM:model];
     }
 }
 
@@ -300,8 +300,8 @@
                                seatID:(NSString *)seatID {
     if ([self isHost]) {
         [self.bottomView updateButtonStatus:KTVRoomBottomStatusPhone isRed:YES];
-        [self.userListCompoments updateWithRed:YES];
-        [self.userListCompoments update];
+        [self.userListComponent updateWithRed:YES];
+        [self.userListComponent update];
     }
 }
 
@@ -309,7 +309,7 @@
                                reply:(NSInteger)reply {
     if ([self isHost] && reply == 2) {
         NSString *message = [NSString stringWithFormat:@"观众%@拒绝了你的邀请", hostUserModel.name];
-        [[ToastComponents shareToastComponents] showWithMessage:message];
+        [[ToastComponent shareToastComponent] showWithMessage:message];
     }
 }
 
@@ -320,15 +320,15 @@
         
     }];
     if (mic) {
-        [[ToastComponents shareToastComponents] showWithMessage:@"主播已解除对你的静音"];
+        [[ToastComponent shareToastComponent] showWithMessage:@"主播已解除对你的静音"];
     } else {
-        [[ToastComponents shareToastComponents] showWithMessage:@"你已被主播静音"];
+        [[ToastComponent shareToastComponent] showWithMessage:@"你已被主播静音"];
     }
 }
 
 - (void)receivedClearUserWithUid:(NSString *)uid {
     [self hangUp:NO];
-    [[ToastComponents shareToastComponents] showWithMessage:@"相同ID用户已登录，您已被强制下线！" delay:0.8];
+    [[ToastComponent shareToastComponent] showWithMessage:@"相同ID用户已登录，您已被强制下线！" delay:0.8];
 }
 
 - (void)hangUp:(BOOL)isServer {
@@ -353,14 +353,16 @@
 }
 
 - (void)receivedStartSingSong:(KTVSongModel *)songModel {
-    [self.musicCompoments startSingWithSongModel:songModel];
+    [self.musicComponent startSingWithSongModel:songModel];
     [self.pickSongComponent updatePickedSongList];
-    [self.seatCompoments updateCurrentSongModel:songModel];
+    [self.seatComponent updateCurrentSongModel:songModel];
     [self.hostAvatarView updateCurrentSongModel:songModel];
 }
 
-- (void)receivedFinishSingSong:(NSInteger)score nextSongModel:(KTVSongModel *)nextSongModel {
-    [self.musicCompoments showSongEndSongModel:nextSongModel score:score];
+- (void)receivedFinishSingSong:(NSInteger)score
+                 nextSongModel:(KTVSongModel *)nextSongModel
+                  curSongModel:(KTVSongModel *)curSongModel {
+    [self.musicComponent showSongEndSongModel:nextSongModel curSongModel:curSongModel score:score];
     [self.pickSongComponent updatePickedSongList];
 }
 
@@ -369,7 +371,7 @@
 - (void)loadDataWithJoinRoom {
     __weak __typeof(self) wself = self;
     [KTVRTMManager joinLiveRoom:self.roomModel.roomID
-                              userName:[LocalUserComponents userModel].name
+                              userName:[LocalUserComponent userModel].name
                                  block:^(
                                          NSString * _Nonnull RTCToken,
                                          KTVRoomModel * _Nonnull roomModel,
@@ -401,7 +403,7 @@
 }
 
 #pragma mark - KTVPickSongComponentDelegate
-- (void)ktvPickSongComponent:(KTVPickSongComponent *)componment pickedSongCountChanged:(NSInteger)count {
+- (void)ktvPickSongComponent:(KTVPickSongComponent *)component pickedSongCountChanged:(NSInteger)count {
     [self.bottomView updatePickedSongCount:count];
 }
 
@@ -411,18 +413,18 @@
                      itemButton:(KTVRoomItemButton *_Nullable)itemButton
                 didSelectStatus:(KTVRoomBottomStatus)status {
     if (status == KTVRoomBottomStatusInput) {
-        [self.textInputCompoments showWithRoomModel:self.roomModel];
+        [self.textInputComponent showWithRoomModel:self.roomModel];
         __weak __typeof(self) wself = self;
-        self.textInputCompoments.clickSenderBlock = ^(NSString * _Nonnull text) {
+        self.textInputComponent.clickSenderBlock = ^(NSString * _Nonnull text) {
             KTVIMModel *model = [[KTVIMModel alloc] init];
             NSString *message = [NSString stringWithFormat:@"%@：%@",
-                                 [LocalUserComponents userModel].name,
+                                 [LocalUserComponent userModel].name,
                                  text];
             model.message = message;
-            [wself.imCompoments addIM:model];
+            [wself.imComponent addIM:model];
         };
     } else if (status == KTVRoomBottomStatusPhone) {
-        [self.userListCompoments showRoomModel:self.roomModel
+        [self.userListComponent showRoomModel:self.roomModel
                                         seatID:@"-1"
                                   dismissBlock:^{
             
@@ -446,11 +448,11 @@
 
 #pragma mark - KTVSeatDelegate
 
-- (void)KTVSeatCompoments:(KTVSeatCompoments *)KTVSeatCompoments
+- (void)KTVSeatComponent:(KTVSeatComponent *)KTVSeatComponent
                     clickButton:(KTVSeatModel *)seatModel
                     sheetStatus:(KTVSheetStatus)sheetStatus {
     if (sheetStatus == KTVSheetStatusInvite) {
-        [self.userListCompoments showRoomModel:self.roomModel
+        [self.userListComponent showRoomModel:self.roomModel
                                         seatID:[NSString stringWithFormat:@"%ld", (long)seatModel.index]
                                   dismissBlock:^{
             
@@ -468,29 +470,33 @@
     if (volumeInfo.count > 0) {
         NSNumber *volumeValue = volumeInfo[self.roomModel.hostUid];
         [self.hostAvatarView updateHostVolume:volumeValue];
-        [self.seatCompoments updateSeatVolume:volumeInfo];
+        [self.seatComponent updateSeatVolume:volumeInfo];
     }
 }
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(NSString *)time {
     dispatch_queue_async_safe(dispatch_get_main_queue(), ^{
-        [self.musicCompoments updateCurrentSongTime:[time integerValue]];
+        [self.musicComponent updateCurrentSongTime:[time integerValue]];
     });
 }
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager songEnds:(BOOL)result {
-    [self.musicCompoments stopSong];
+    [self.musicComponent stopSong];
 }
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onAudioMixingPlayingProgress:(NSInteger)progress {
     dispatch_queue_async_safe(dispatch_get_main_queue(), ^{
-        [self.musicCompoments sendSongTime:progress];
+        [self.musicComponent sendSongTime:progress];
     });
 }
 
-#pragma mark - MusicCompomentsDelegate
+- (void)KTVRTCManagerOnAudioRouteChanged:(KTVRTCManager *)KTVRTCManager {
+    [self.musicComponent updateAudioRouteChanged];
+}
 
-- (void)musicCompoments:(KTVMusicCompoments *)musicCompoments clickPlayMusic:(BOOL)isClick {
+#pragma mark - MusicComponentDelegate
+
+- (void)musicComponent:(KTVMusicComponent *)musicComponent clickPlayMusic:(BOOL)isClick {
     [self showPickSongView];
 }
 
@@ -501,7 +507,7 @@
                                       reply:type
                                       block:^(RTMACKModel * _Nonnull model) {
         if (!model.result) {
-            [[ToastComponents shareToastComponents] showWithMessage:model.message];
+            [[ToastComponent shareToastComponent] showWithMessage:model.message];
         }
     }];
 }
@@ -537,18 +543,18 @@
     [KTVRTCManager shareRtc].delegate = self;
     [[KTVRTCManager shareRtc] joinChannelWithToken:rtcToken
                                                   roomID:self.roomModel.roomID
-                                                     uid:[LocalUserComponents userModel].uid];
+                                                     uid:[LocalUserComponent userModel].uid];
     if (userModel.userRole == KTVUserRoleHost) {
         [[KTVRTCManager shareRtc] enableLocalAudio:(userModel.mic == KTVUserMicOn) ? YES : NO];
     }
     self.hostAvatarView.userModel = self.hostUserModel;
     self.staticView.roomModel = self.roomModel;
     [self.bottomView updateBottomLists:userModel];
-    [self.seatCompoments showSeatView:seatList loginUserModel:userModel];
-    [self.musicCompoments updateUserModel:userModel];
-    [self.musicCompoments startSingWithSongModel:songModel];
-    
-    [self.seatCompoments updateCurrentSongModel:songModel];
+    [self.seatComponent showSeatView:seatList loginUserModel:userModel];
+    [self.musicComponent updateUserModel:userModel];
+    [self.musicComponent startSingWithSongModel:songModel];
+
+    [self.seatComponent updateCurrentSongModel:songModel];
     [self.hostAvatarView updateCurrentSongModel:songModel];
 }
 
@@ -592,9 +598,9 @@
         make.bottom.equalTo(self.view);
     }];
     
-    [self musicCompoments];
-    [self imCompoments];
-    [self textInputCompoments];
+    [self musicComponent];
+    [self imComponent];
+    [self textInputComponent];
     [self pickSongComponent];
 }
 
@@ -629,7 +635,7 @@
 }
 
 - (BOOL)isHost {
-    return [self.roomModel.hostUid isEqualToString:[LocalUserComponents userModel].uid];
+    return [self.roomModel.hostUid isEqualToString:[LocalUserComponent userModel].uid];
 }
 
 - (NSArray *)getDefaultSeatDataList {
@@ -649,11 +655,11 @@
 
 #pragma mark - Getter
 
-- (KTVTextInputCompoments *)textInputCompoments {
-    if (!_textInputCompoments) {
-        _textInputCompoments = [[KTVTextInputCompoments alloc] init];
+- (KTVTextInputComponent *)textInputComponent {
+    if (!_textInputComponent) {
+        _textInputComponent = [[KTVTextInputComponent alloc] init];
     }
-    return _textInputCompoments;
+    return _textInputComponent;
 }
 
 - (KTVStaticView *)staticView {
@@ -670,12 +676,12 @@
     return _hostAvatarView;
 }
 
-- (KTVSeatCompoments *)seatCompoments {
-    if (!_seatCompoments) {
-        _seatCompoments = [[KTVSeatCompoments alloc] initWithSuperView:self.seatContentView];
-        _seatCompoments.delegate = self;
+- (KTVSeatComponent *)seatComponent {
+    if (!_seatComponent) {
+        _seatComponent = [[KTVSeatComponent alloc] initWithSuperView:self.seatContentView];
+        _seatComponent.delegate = self;
     }
-    return _seatCompoments;
+    return _seatComponent;
 }
 
 - (KTVRoomBottomView *)bottomView {
@@ -686,31 +692,31 @@
     return _bottomView;
 }
 
-- (KTVRoomUserListCompoments *)userListCompoments {
-    if (!_userListCompoments) {
-        _userListCompoments = [[KTVRoomUserListCompoments alloc] init];
+- (KTVRoomUserListComponent *)userListComponent {
+    if (!_userListComponent) {
+        _userListComponent = [[KTVRoomUserListComponent alloc] init];
     }
-    return _userListCompoments;
+    return _userListComponent;
 }
 
-- (KTVIMCompoments *)imCompoments {
-    if (!_imCompoments) {
-        _imCompoments = [[KTVIMCompoments alloc] initWithSuperView:self.view];
+- (KTVIMComponent *)imComponent {
+    if (!_imComponent) {
+        _imComponent = [[KTVIMComponent alloc] initWithSuperView:self.view];
     }
-    return _imCompoments;
+    return _imComponent;
 }
 
-- (KTVMusicCompoments *)musicCompoments {
-    if (!_musicCompoments) {
-        _musicCompoments = [[KTVMusicCompoments alloc] initWithSuperView:self.view
+- (KTVMusicComponent *)musicComponent {
+    if (!_musicComponent) {
+        _musicComponent = [[KTVMusicComponent alloc] initWithSuperView:self.view
                                                                   roomID:self.roomModel.roomID];
-        _musicCompoments.delegate = self;
+        _musicComponent.delegate = self;
     }
-    return _musicCompoments;
+    return _musicComponent;
 }
 
 - (void)dealloc {
-    [self.musicCompoments dismissTuningPanel];
+    [self.musicComponent dismissTuningPanel];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [[AlertActionManager shareAlertActionManager] dismiss:^{
         

@@ -2,8 +2,8 @@
 //  CreateRoomViewController.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import "KTVCreateRoomViewController.h"
@@ -50,26 +50,26 @@
 }
 
 - (void)joinButtonAction:(UIButton *)sender {
-    sender.userInteractionEnabled = NO;
+    [[ToastComponent shareToastComponent] showLoading];
     __weak __typeof(self) wself = self;
     [KTVRTMManager startLive:self.roomNameLabel.text
-                                 userName:[LocalUserComponents userModel].name
+                                 userName:[LocalUserComponent userModel].name
                               bgImageName:_bgImageName
                                     block:^(NSString * _Nonnull RTCToken,
                                             KTVRoomModel * _Nonnull roomModel,
                                             KTVUserModel * _Nonnull hostUserModel,
                                             RTMACKModel * _Nonnull model) {
         if (model.result) {
-            [PublicParameterCompoments share].roomId = roomModel.roomID;
+            [PublicParameterComponent share].roomId = roomModel.roomID;
             KTVRoomViewController *next = [[KTVRoomViewController alloc]
                                                  initWithRoomModel:roomModel
                                                  rtcToken:RTCToken
                                                  hostUserModel:hostUserModel];
             [wself.navigationController pushViewController:next animated:YES];
         } else {
-            [[ToastComponents shareToastComponents] showWithMessage:model.message];
+            [[ToastComponent shareToastComponent] showWithMessage:model.message];
         }
-        sender.userInteractionEnabled = YES;
+        [[ToastComponent shareToastComponent] dismiss];
     }];
 }
 
@@ -156,7 +156,7 @@
         _roomNameLabel = [[UILabel alloc] init];
         _roomNameLabel.font = [UIFont systemFontOfSize:14];
         _roomNameLabel.textColor = [UIColor colorFromHexString:@"#FFFFFF"];
-        _roomNameLabel.text = [NSString stringWithFormat:@"%@的K歌房", [LocalUserComponents userModel].name];
+        _roomNameLabel.text = [NSString stringWithFormat:@"%@的K歌房", [LocalUserComponent userModel].name];
     }
     return _roomNameLabel;
 }

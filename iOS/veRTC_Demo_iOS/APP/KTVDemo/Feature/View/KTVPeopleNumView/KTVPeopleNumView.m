@@ -2,8 +2,8 @@
 //  KTVPeopleNumView.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/10/12.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/10/12.
+//  
 //
 
 #import "KTVPeopleNumView.h"

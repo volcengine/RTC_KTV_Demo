@@ -2,8 +2,8 @@
 //  KTVRoomViewController+SocketControl.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/28.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/28.
+//  
 //
 
 #import "KTVRoomViewController+SocketControl.h"
@@ -109,8 +109,8 @@
         [wself receivedStartSingSong:songModel];
     }];
     
-    [KTVRTMManager onFinishSingSongBlock:^(KTVSongModel * _Nonnull nextSongModel, NSInteger score) {
-        [wself receivedFinishSingSong:score nextSongModel:nextSongModel];
+    [KTVRTMManager onFinishSingSongBlock:^(KTVSongModel * _Nonnull nextSongModel, KTVSongModel * _Nonnull curSongModel, NSInteger score) {
+        [wself receivedFinishSingSong:score nextSongModel:nextSongModel curSongModel:curSongModel];
     }];
 }
 @end

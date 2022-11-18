@@ -2,8 +2,8 @@
 //  KTVHiFiveManager.h
 //  veRTC_Demo
 //
-//  Created by bytedance on 2022/1/21.
-//  Copyright © 2022 bytedance. All rights reserved.
+//  Created by on 2022/1/21.
+//  
 //
 
 #import <Foundation/Foundation.h>

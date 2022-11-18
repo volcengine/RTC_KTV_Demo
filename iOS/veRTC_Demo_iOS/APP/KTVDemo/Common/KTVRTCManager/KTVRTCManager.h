@@ -1,5 +1,5 @@
 #import "KTVRTCManager.h"
-#import <VolcEngineRTC/objc/rtc/ByteRTCEngineKit.h>
+#import <VolcEngineRTC/objc/ByteRTCVideo.h>
 #import "KTVRoomParamInfoModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -16,11 +16,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onAudioMixingPlayingProgress:(NSInteger)progress;
 
+/// 用户音频播放路由改变回调
+/// @param KTVRTCManager RTC manager
+- (void)KTVRTCManagerOnAudioRouteChanged:(KTVRTCManager *_Nonnull)KTVRTCManager;
+
 @end
 
 @interface KTVRTCManager : BaseRTCManager
 
 @property (nonatomic, weak) id<KTVRTCManagerDelegate> delegate;
+
+/// 是否可以开启耳返
+@property(nonatomic, assign, readonly) BOOL canEarMonitor;
 
 /*
  * RTC Manager Singletons
@@ -53,16 +60,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Leave the room
  */
 - (void)leaveChannel;
-
-/*
- * destroy
- */
-- (void)destroy;
-
-/*
- * gGet Sdk Version
- */
-- (NSString *_Nullable)getSdkVersion;
 
 #pragma mark - Singing Music Method
 

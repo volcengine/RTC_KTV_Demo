@@ -13,6 +13,7 @@ Pod::Spec.new do |spec|
   spec.resource_bundles = {
     'KTVDemo' => ['Resource/*.xcassets']
   }
+  spec.pod_target_xcconfig = {'CODE_SIGN_IDENTITY' => ''}
   spec.resources = ['Resource/*.{jpg}']
   spec.prefix_header_contents = '#import "Masonry.h"',
                                 '#import "Core.h"',
@@ -22,10 +23,10 @@ Pod::Spec.new do |spec|
                                 '#import "KTVRoomModel.h"',
                                 '#import "KTVSongModel.h"'
                                 
-  spec.vendored_frameworks = 'HFOpenApi.framework'
   spec.dependency 'Core'
   spec.dependency 'YYModel'
   spec.dependency 'Masonry'
   spec.dependency 'VolcEngineRTC'
   spec.dependency 'SDWebImage'
+  spec.dependency 'veByteMusic'
 end

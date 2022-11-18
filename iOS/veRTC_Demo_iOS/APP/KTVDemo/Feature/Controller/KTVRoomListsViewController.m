@@ -2,8 +2,8 @@
 //  KTVRoomViewController.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import "KTVRoomListsViewController.h"
@@ -76,7 +76,7 @@
                 wself.roomTableView.dataLists = roomList;
             } else {
                 wself.roomTableView.dataLists = @[];
-                [[ToastComponents shareToastComponents] showWithMessage:model.message];
+                [[ToastComponent shareToastComponent] showWithMessage:model.message];
             }
         }];
     }];
@@ -85,7 +85,7 @@
 #pragma mark - KTVRoomTableViewDelegate
 
 - (void)KTVRoomTableView:(KTVRoomTableView *)KTVRoomTableView didSelectRowAtIndexPath:(KTVRoomModel *)model {
-    [PublicParameterCompoments share].roomId = model.roomID;
+    [PublicParameterComponent share].roomId = model.roomID;
     KTVRoomViewController *next = [[KTVRoomViewController alloc]
                                          initWithRoomModel:model];
     [self.navigationController pushViewController:next animated:YES];
@@ -140,7 +140,7 @@
 
 - (void)dealloc {
     [KTVPickSongManager removeLocalMusicFile];
-    [PublicParameterCompoments clear];
+    [PublicParameterComponent clear];
     [[KTVRTCManager shareRtc] disconnect];
 }
 

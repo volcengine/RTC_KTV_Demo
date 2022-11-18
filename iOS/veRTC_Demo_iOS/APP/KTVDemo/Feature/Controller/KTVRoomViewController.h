@@ -2,8 +2,8 @@
 //  KTVRoomViewController.h
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import <UIKit/UIKit.h>
@@ -62,7 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)receivedStartSingSong:(KTVSongModel *)songModel;
 
-- (void)receivedFinishSingSong:(NSInteger)score nextSongModel:(KTVSongModel *)nextSongModel;
+- (void)receivedFinishSingSong:(NSInteger)score
+                 nextSongModel:(KTVSongModel *)nextSongModel
+                  curSongModel:(KTVSongModel *)curSongModel;
 
 @end
 

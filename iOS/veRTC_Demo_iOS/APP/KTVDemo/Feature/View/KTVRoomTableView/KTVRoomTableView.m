@@ -2,17 +2,17 @@
 //  KTVRoomTableView.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import "KTVRoomTableView.h"
-#import "KTVEmptyCompoments.h"
+#import "KTVEmptyComponent.h"
 
 @interface KTVRoomTableView () <UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) UITableView *roomTableView;
-@property (nonatomic, strong) KTVEmptyCompoments *emptyCompoments;
+@property (nonatomic, strong) KTVEmptyComponent *emptyComponent;
 
 @end
 
@@ -38,9 +38,9 @@
     
     [self.roomTableView reloadData];
     if (dataLists.count <= 0) {
-        [self.emptyCompoments show];
+        [self.emptyComponent show];
     } else {
-        [self.emptyCompoments dismiss];
+        [self.emptyComponent dismiss];
     }
 }
 
@@ -84,12 +84,12 @@
     return _roomTableView;
 }
 
-- (KTVEmptyCompoments *)emptyCompoments {
-    if (!_emptyCompoments) {
-        _emptyCompoments = [[KTVEmptyCompoments alloc] initWithView:self
+- (KTVEmptyComponent *)emptyComponent {
+    if (!_emptyComponent) {
+        _emptyComponent = [[KTVEmptyComponent alloc] initWithView:self
                                                                   message:@"还没有人创建KTV,快去创建吧"];
     }
-    return _emptyCompoments;
+    return _emptyComponent;
 }
 
 @end

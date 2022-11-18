@@ -2,8 +2,8 @@
 //  KTVHiFiveManager.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2022/1/21.
-//  Copyright © 2022 bytedance. All rights reserved.
+//  Created by on 2022/1/21.
+//  
 //
 
 #import "KTVHiFiveManager.h"
@@ -15,7 +15,7 @@
 #pragma mark - HiFive
 + (void)registerHiFive {
     
-    NSString *userID = [LocalUserComponents userModel].uid;
+    NSString *userID = [LocalUserComponent userModel].uid;
     NSString *appID = HiFiveAppID;
     NSString *serverCode = HiFiveServerCode;
     [[HFOpenApiManager shared] registerAppWithAppId:appID serverCode:serverCode clientId:userID version:@"V4.1.2" success:^(id  _Nullable response) {
@@ -81,7 +81,7 @@
         !complete? :complete(downloadModel);
         
     } fail:^(NSError * _Nullable error) {
-        [[ToastComponents shareToastComponents] showWithMessage:error.description];
+        [[ToastComponent shareToastComponent] showWithMessage:error.description];
         !complete? :complete(nil);
     }];
 }

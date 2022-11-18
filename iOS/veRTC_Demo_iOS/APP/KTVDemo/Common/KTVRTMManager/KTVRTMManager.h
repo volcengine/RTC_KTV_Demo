@@ -1,8 +1,8 @@
 //
-//  KTVControlCompoments.h
+//  KTVControlComponent.h
 //  SceneRTCDemo
 //
-//  Created by bytedance on 2021/3/16.
+//  Created by on 2021/3/16.
 //
 
 #import <Foundation/Foundation.h>
@@ -278,7 +278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Finish sing song
 /// @param block Callback
-+ (void)onFinishSingSongBlock:(void(^)(KTVSongModel *nextSongModel, NSInteger score))block;
++ (void)onFinishSingSongBlock:(void (^)(KTVSongModel * _Nonnull, KTVSongModel * _Nonnull, NSInteger))block;
 
 
 #pragma mark - Single Notification Message

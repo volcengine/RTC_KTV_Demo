@@ -2,18 +2,18 @@
 //  KTVRoomCell.m
 //  veRTC_Demo
 //
-//  Created by bytedance on 2021/5/18.
-//  Copyright © 2021 . All rights reserved.
+//  Created by on 2021/5/18.
+//  
 //
 
 #import "KTVRoomCell.h"
-#import "KTVAvatarCompoments.h"
+#import "KTVAvatarComponent.h"
 
 @interface KTVRoomCell ()
 
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UILabel *roomNameLabel;
-@property (nonatomic, strong) KTVAvatarCompoments *avatarView;
+@property (nonatomic, strong) KTVAvatarComponent *avatarView;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UIImageView *iconImageView;
 @property (nonatomic, strong) UIImageView *peopleNumImageView;
@@ -28,7 +28,7 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.contentView.backgroundColor = [UIColor clearColor];
-        [self createUIComponents];
+        [self createUIComponent];
     }
     return self;
 }
@@ -43,7 +43,7 @@
 
 #pragma mark - Private Action
 
-- (void)createUIComponents {
+- (void)createUIComponent {
     [self.contentView addSubview:self.bgView];
     [self.bgView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.contentView).offset(16);
@@ -152,9 +152,9 @@
     return _roomNameLabel;
 }
 
-- (KTVAvatarCompoments *)avatarView {
+- (KTVAvatarComponent *)avatarView {
     if (!_avatarView) {
-        _avatarView = [[KTVAvatarCompoments alloc] init];
+        _avatarView = [[KTVAvatarComponent alloc] init];
         _avatarView.layer.cornerRadius = 20;
         _avatarView.layer.masksToBounds = YES;
         _avatarView.fontSize = 20;

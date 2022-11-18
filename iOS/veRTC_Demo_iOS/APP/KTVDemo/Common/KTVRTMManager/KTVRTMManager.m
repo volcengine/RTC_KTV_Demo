@@ -1,12 +1,13 @@
 //
-//  KTVControlCompoments.m
+//  KTVControlComponent.m
 //  SceneRTCDemo
 //
-//  Created by bytedance on 2021/3/16.
+//  Created by on 2021/3/16.
 //
 
 #import "KTVRTMManager.h"
 #import "KTVRTCManager.h"
+#import "JoinRTSParams.h"
 
 @implementation KTVRTMManager
 
@@ -22,7 +23,7 @@
     NSDictionary *dic = @{@"room_name" : roomName,
                           @"background_image_name" : bgImageName,
                           @"user_name" : userName};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvStartLive" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
 
@@ -45,7 +46,7 @@
                   block:(void (^)(NSArray<KTVUserModel *> *userLists,
                                   RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvGetAudienceList" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -68,7 +69,7 @@
                        block:(void (^)(NSArray<KTVUserModel *> *userLists,
                                        RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvGetApplyAudienceList" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -94,7 +95,7 @@
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"audience_user_id" : uid,
                           @"seat_id" : @(seatID.integerValue)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvInviteInteract" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -110,7 +111,7 @@
              block:(void (^)(RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"audience_user_id" : uid};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvAgreeApply" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -126,7 +127,7 @@
                        block:(void (^)(RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"type" : @(type)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvManageInteractApply" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -144,7 +145,7 @@
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"seat_id" : @(seatID.integerValue),
                           @"type" : @(type)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvManageSeat" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -160,7 +161,7 @@
         return;
     }
     NSDictionary *dic = @{@"room_id" : roomID};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvFinishLive" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         NSLog(@"[%@]-ktvFinishLive %@ \n %@", [self class], dic, ackModel.response);
@@ -174,7 +175,7 @@
         return;
     }
     NSDictionary *dic = @{@"room_id" : roomID};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvGetRequestSongList" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -199,7 +200,7 @@
         @"song_duration" : @(songModel.musicAllTime),
         @"cover_url" : songModel.coverURLString,
     };
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvRequestSong" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -215,7 +216,7 @@
     NSDictionary *dic = @{
         @"room_id" : roomID,
     };
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvCutOffSong" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -237,7 +238,7 @@
         @"song_id" : songID,
         @"score" : @(score),
     };
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvFinishSing" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -268,7 +269,7 @@
                                RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"user_name" : userName};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvJoinLiveRoom" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -312,7 +313,7 @@
               block:(void (^)(RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"reply" : @(reply)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvReplyInvite" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -328,7 +329,7 @@
                  block:(void (^)(RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"seat_id" : @(seatID.integerValue)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvFinishInteract" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
 
@@ -345,7 +346,7 @@
                                 RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"seat_id" : @(seatID.integerValue)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvApplyInteract" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -363,7 +364,7 @@
 
 + (void)leaveLiveRoom:(NSString *)roomID {
     NSDictionary *dic = @{@"room_id" : roomID};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvLeaveLiveRoom" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         NSLog(@"[%@]-ktvLeaveLiveRoom %@ \n %@", [self class], dic, ackModel.response);
@@ -375,7 +376,7 @@
 
 + (void)getActiveLiveRoomListWithBlock:(void (^)(NSArray<KTVRoomModel *> *roomList,
                                                  RTMACKModel *model))block {
-    NSDictionary *dic = [PublicParameterCompoments addTokenToParams:nil];
+    NSDictionary *dic = [JoinRTSParams addTokenToParams:nil];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvGetActiveLiveRoomList" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -395,7 +396,7 @@
 }
 
 + (void)clearUser:(void (^)(RTMACKModel *model))block {
-    NSDictionary *dic = [PublicParameterCompoments addTokenToParams:nil];
+    NSDictionary *dic = [JoinRTSParams addTokenToParams:nil];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvClearUser" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -412,7 +413,7 @@
     NSString *encodedString = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,(CFStringRef)message,NULL,NULL,kCFStringEncodingUTF8));
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"message" : encodedString};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvSendMessage" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -428,7 +429,7 @@
                     block:(void (^)(RTMACKModel *model))block {
     NSDictionary *dic = @{@"room_id" : roomID,
                           @"mic" : @(mic)};
-    dic = [PublicParameterCompoments addTokenToParams:dic];
+    dic = [JoinRTSParams addTokenToParams:dic];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvUpdateMediaStatus" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -446,7 +447,7 @@
                                      KTVSongModel *songModel,
                                      NSArray<KTVSeatModel *> *seatList,
                                      RTMACKModel *model))block {
-    NSDictionary *dic = [PublicParameterCompoments addTokenToParams:nil];
+    NSDictionary *dic = [JoinRTSParams addTokenToParams:nil];
     
     [[KTVRTCManager shareRtc] emitWithAck:@"ktvReconnect" with:dic block:^(RTMACKModel * _Nonnull ackModel) {
         
@@ -660,17 +661,21 @@
     }];
 }
 
-+ (void)onFinishSingSongBlock:(void(^)(KTVSongModel *nextSongModel, NSInteger score))block {
++ (void)onFinishSingSongBlock:(void(^)(KTVSongModel *nextSongModel,
+                                       KTVSongModel *curSongModel,
+                                       NSInteger score))block {
     [[KTVRTCManager shareRtc] onSceneListener:@"ktvOnFinishSing" block:^(RTMNoticeModel * _Nonnull noticeModel) {
         
         KTVSongModel *nextSongModel = nil;
+        KTVSongModel *curSongModel = nil;
         NSInteger score = 0;
         if (noticeModel.data && [noticeModel.data isKindOfClass:[NSDictionary class]]) {
             nextSongModel = [KTVSongModel yy_modelWithJSON:noticeModel.data[@"next_song"]];
+            curSongModel = [KTVSongModel yy_modelWithJSON:noticeModel.data[@"cur_song"]];
             score = [noticeModel.data[@"score"] integerValue];
         }
         if (block) {
-            block(nextSongModel, score);
+            block(nextSongModel, curSongModel, score);
         }
         NSLog(@"[%@]-ktvOnFinishSingSong %@", [self class], noticeModel.data);
     }];
