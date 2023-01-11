@@ -205,10 +205,10 @@
         return;
     }
     
-    NSString *time = [[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding];
+    NSString *json = [[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding];
     
     if ([self.delegate respondsToSelector:@selector(KTVRTCManager:onStreamSyncInfoReceived:)]) {
-        [self.delegate KTVRTCManager:self onStreamSyncInfoReceived:time];
+        [self.delegate KTVRTCManager:self onStreamSyncInfoReceived:json];
     }
 }
 

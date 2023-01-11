@@ -72,6 +72,13 @@
     [self.tuningView updateAudioRouteChanged];
 }
 
+- (void)updateLrcHidden:(BOOL)isHidden {
+    self.lyricsView.hidden = isHidden;
+    if (isHidden) {
+        [self.lyricsView resetStatus];
+    }
+}
+
 #pragma mark - Private Action
 
 - (void)maskButtonAction {

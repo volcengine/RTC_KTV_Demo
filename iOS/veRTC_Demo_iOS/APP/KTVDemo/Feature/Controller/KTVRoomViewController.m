@@ -176,7 +176,7 @@
         [[ToastComponent shareToastComponent] showWithMessage:@"直播间内容违规，直播间已被关闭" delay:0.8];
     }
     else if (type == 2 && [self isHost]) {
-        [[ToastComponent shareToastComponent] showWithMessage:@"本次体验时间已超过20mins" delay:0.8];
+        [[ToastComponent shareToastComponent] showWithMessage:@"本次体验时间已超过20分钟" delay:0.8];
     } else {
         if (![self isHost]) {
             [[ToastComponent shareToastComponent] showWithMessage:@"直播间已结束" delay:0.8];
@@ -310,6 +310,7 @@
     if ([self isHost] && reply == 2) {
         NSString *message = [NSString stringWithFormat:@"观众%@拒绝了你的邀请", hostUserModel.name];
         [[ToastComponent shareToastComponent] showWithMessage:message];
+        [self.userListComponent update];
     }
 }
 
@@ -474,9 +475,9 @@
     }
 }
 
-- (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(NSString *)time {
+- (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(nonnull NSString *)json {
     dispatch_queue_async_safe(dispatch_get_main_queue(), ^{
-        [self.musicComponent updateCurrentSongTime:[time integerValue]];
+        [self.musicComponent updateCurrentSongTime:json];
     });
 }
 

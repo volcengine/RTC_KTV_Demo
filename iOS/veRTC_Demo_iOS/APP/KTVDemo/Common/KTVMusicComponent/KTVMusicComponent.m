@@ -107,6 +107,7 @@ typedef NS_ENUM(NSInteger, KTVMusicViewStatus) {
         [self showMusicViewWithStatus:KTVMusicViewStatusShowMusic];
         [self startWithSongModel:songModel
                   loginUserModel:self.loginUserModel];
+        
     } else {
         [self showMusicViewWithStatus:KTVMusicViewStatusShowNull];
         if ([_aboveSongModel.pickedUserID isEqualToString:[LocalUserComponent userModel].uid]) {
@@ -168,9 +169,15 @@ typedef NS_ENUM(NSInteger, KTVMusicViewStatus) {
     self.musicNullView.loginUserModel = loginUserModel;
 }
 
-- (void)updateCurrentSongTime:(NSInteger)songTime {
-    // The remote end receives the synchronization information
-    self.musicView.time = songTime;
+- (void)updateCurrentSongTime:(NSString *)json {
+    NSDictionary *dic = [NetworkingTool decodeJsonMessage:json];
+    if (dic && [dic isKindOfClass:[NSDictionary class]]) {
+        NSInteger progress = [dic[@"progress"] integerValue];
+        NSString *musicId = dic[@"music_id"];
+        if ([musicId isEqualToString:self.songModel.musicId]) {
+            self.musicView.time = progress;
+        }
+    }
 }
 
 - (void)dismissTuningPanel {
@@ -178,14 +185,19 @@ typedef NS_ENUM(NSInteger, KTVMusicViewStatus) {
 }
 
 - (void)sendSongTime:(NSInteger)songTime {
-    if ([self isSingerWithSongModel:self.songModel loginUserModel:self.loginUserModel]) {
+    if ([self isSingerWithSongModel:self.songModel loginUserModel:self.loginUserModel] &&
+        self.songModel && NOEmptyStr(self.songModel.musicId)) {
         NSTimeInterval second = (NSTimeInterval)songTime / 1000;
-        // update self
         self.musicView.time = second;
+        NSDictionary *dic = @{@"progress" : @(second),
+                              @"music_id" : self.songModel.musicId};
+        NSString *json = [dic yy_modelToJSONString];
         
-        // update remote artist
-        NSString *timeStr = [NSString stringWithFormat:@"%ld", (long)second];
-        [[KTVRTCManager shareRtc] sendStreamSyncTime:timeStr];
+        // 发送给远端歌词进度
+        [[KTVRTCManager shareRtc] sendStreamSyncTime:json];
+        
+        // 更新本地歌词进度
+        [self updateCurrentSongTime:json];
     }
 }
 
@@ -237,14 +249,13 @@ typedef NS_ENUM(NSInteger, KTVMusicViewStatus) {
     NSString *aboveSongID = [NSString stringWithFormat:@"%@_%@", _aboveSongModel.musicId, _aboveSongModel.pickedUserID];
     NSString *songID = [NSString stringWithFormat:@"%@_%@", songModel.musicId, songModel.pickedUserID];
     
-    // 如果是相同歌曲，相同演唱者丢弃该消息
     if ([aboveSongID isEqualToString:songID]) {
+        // 如果是相同歌曲，相同演唱者丢弃该消息
         return;
-    }
-    
-    // 切歌时会下发新歌，演唱者需要先暂停上一首歌。
-    if (![aboveSongID isEqualToString:songID]) {
+    } else {
+        // 切歌时会下发新歌，演唱者需要先暂停上一首歌。
         if ([_aboveSongModel.pickedUserID isEqualToString:[LocalUserComponent userModel].uid]) {
+            [[KTVRTCManager shareRtc] enableEarMonitor:NO];
             [[KTVRTCManager shareRtc] stopSinging];
         }
     }
@@ -253,12 +264,14 @@ typedef NS_ENUM(NSInteger, KTVMusicViewStatus) {
                             loginUserModel:loginUserModel];
     
     __weak __typeof(self) wself = self;
+    [self.musicView updateLrcHidden:YES];
     [KTVPickSongManager requestDownSongModel:songModel complete:^(KTVDownloadSongModel * _Nonnull downloadSongModel) {
         // LRC
         [KTVPickSongManager getLRCFilePath:downloadSongModel
                                   complete:^(NSString * _Nonnull filePath) {
             if (NOEmptyStr(filePath)) {
                 // Initialize lyrics
+                [wself.musicView updateLrcHidden:NO];
                 [wself.musicView loadLrcByPath:filePath];
                 // Singer
                 if ([wself isSingerWithSongModel:songModel

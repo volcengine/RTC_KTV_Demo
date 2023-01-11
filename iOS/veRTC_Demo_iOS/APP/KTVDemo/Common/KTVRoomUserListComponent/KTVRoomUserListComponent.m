@@ -220,6 +220,8 @@
                 [[ToastComponent shareToastComponent] showWithMessage:model.message];
             }
         }];
+    } else if (userModel.status == KTVUserStatusInvite) {
+        [[ToastComponent shareToastComponent] showWithMessage:@"已向观众发出邀请，等待对方应答"];
     } else {
         
     }

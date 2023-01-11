@@ -43,6 +43,8 @@
         make.centerX.equalTo(self.view);
         make.bottom.equalTo(self.view).offset(- 48 - [DeviceInforTool getVirtualHomeHeight]);
     }];
+    
+    [self loadDataWithGetLists];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -50,8 +52,6 @@
     
     self.navTitle = @"在线KTV";
     [self.rightButton setImage:[UIImage imageNamed:@"edu_refresh" bundleName:HomeBundleName] forState:UIControlStateNormal];
-    
-    [self loadDataWithGetLists];
 }
 
 - (void)rightButtonAction:(BaseButton *)sender {

@@ -7,7 +7,7 @@
 
 ## 前置条件
 
-- [Xcode](https://developer.apple.com/download/all/?q=Xcode) 12.0+
+- [Xcode](https://developer.apple.com/download/all/?q=Xcode) 14.0+
 	
 
 - iOS 12.0+ 真机
@@ -46,83 +46,48 @@
 
 ### 步骤 4：构建工程
 
-1. 打开终端窗口，进入 `RTC_KTV_Demo-master/iOS/veRTC_Demo_iOS` 根目录
-	
+1. 打开终端窗口，进入 `RTC_KTV_Demo/iOS/veRTC_Demo_iOS` 根目录<br>
+	<img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_ab6885a787371079c8bd5a4e554de58a.png" width="500px" >
+2. 执行 `pod install` 命令构建工程	<br>
+	<img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_826318a7b078054b6161b878585f97ad.png" width="500px" >
+3. 进入 `RTC_KTV_Demo/iOS/veRTC_Demo_iOS` 根目录，使用 Xcode 打开 `veRTC_Demo.xcworkspace`<br>
+	<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_d034aa4e052c226eda518eb9696173dd" width="500px" >
 
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_6b2faa8c8c1bb3db6455b47528425479" width="500px" >
+4. 在 Xcode 中打开 `Pods/Development Pods/Core/BuildConfig.h` 文件<br>
+    <img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_0548899b170c606d3fe53adb7c670d4a.jpeg" width="500px" >	
+5. 填写 **HeadUrl**<br>
+    当前你可以使用 **https://common.rtc.volcvideo.com/rtc_demo_special** 作为测试服务器域名，仅提供跑通测试服务，无法保障正式需求。<br>
+    <img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_bfd188ba8820fd30621ba0b3d4ae57b2.jpeg" width="500px" >
 
-2. 执行 `pod install` 命令构建工程
-	
+6. **填写 APPID、APPKey、AccessKeyID 和 SecretAccessKey**<br>
+	使用在火山引擎控制台获取的 **APPID、APPKey、AccessKeyID 和 SecretAccessKey** 填写到 `BuildConfig.h`文件的对应位置。<br>
+    <img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_560b76c0194a7c3b056964a3fefb69d4.png" width="500px" >
+7. 进入 `Pods/Development Pods/KTVDemo/KTVDemoConstants.h` 文件<br>
+	<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_e15732e24984ad415b327c2f4bc867c6" width="500px" >
 
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_4d95cd1807a36514ffff872cb624ba39" width="500px" >
-
-3. 进入 `RTC_KTV_Demo-master/iOS/veRTC_Demo_iOS` 根目录，使用 Xcode 打开 `veRTC_Demo.xcworkspace`
-	
-
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_d034aa4e052c226eda518eb9696173dd" width="500px" >
-
-4. 在 Xcode 中打开 `Pods/Development Pods/Core/BuildConfig.h` 文件
-	
-
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_8a6dcad044038b3b89910f3d13a163a2" width="500px" >
-
-5. 填写 **LoginUrl**
-	
-
-当前你可以使用 **`https://common.rtc.volcvideo.com/rtc_demo_special/login`** 作为测试服务器域名，仅提供跑通测试服务，无法保障正式需求。
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_99370376d83f3751ed25e0b7ee68e93a" width="500px" >
-
-6. **填写 APPID、APPKey、AccessKeyID 和 SecretAccessKey**
-	
-
-使用在火山引擎控制台获取的 **APPID、APPKey、AccessKeyID 和 SecretAccessKey** 填写到 `BuildConfig.h`文件的对应位置。
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_bb28d09f8cd226bd16995d4b4404e56c" width="500px" >
-
-7. 进入 `Pods/Development Pods/KTVDemo/KTVDemoConstants.h` 文件
-	
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_e15732e24984ad415b327c2f4bc867c6" width="500px" >
-
-8. 填写 **HiFiveAppID**、**HiFiveServerCode 和 KEY**
-	
-
-使用在 HIFIVE 控制台获取的**HiFiveAppID**、**HiFiveServerCode 和 KEY 填写到** `KTVDemoConstants.h` 文件的对应位置。
-
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_b5cfca60c03be829f1f215a258f85e3b" width="500px" >
+8. 填写 **HiFiveAppID**、**HiFiveServerCode 和 KEY**<br>
+	使用在 HIFIVE 控制台获取的**HiFiveAppID**、**HiFiveServerCode 和 KEY 填写到** `KTVDemoConstants.h` 文件的对应位置。<br>
+    <img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_d5d704fc28ce159b02a12c05a17ad2a5.png" width="500px" >
 
 ### **步骤 5：配置开发者证书**
 
-1. 将手机连接到电脑，在 `iOS Device` 选项中勾选您的 iOS 设备
-	
+1. 将手机连接到电脑，在 `iOS Device` 选项中勾选您的 iOS 设备<br>
+	<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_767c9fffd909d15392d089773fb935e8" width="500px" >
+2. 登录 Apple ID。<br>
+	2.1 选择 Xcode 页面左上角 **Xcode** > **Preferences**，或通过快捷键 **Command** + **,**  打开 Preferences。<br>
+	2.2 选择 **Accounts**，点击左下部 **+**，选择 Apple ID 进行账号登录。<br>
+		<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_cc2dc2681dbd59dac3a577478a25f096" width="500px" >
 
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_767c9fffd909d15392d089773fb935e8" width="500px" >
+3. 配置开发者证书。<br>
+	3.1 单击 Xcode 左侧导航栏中的 `VeRTC_Demo` 项目，单击 `TARGETS` 下的 `VeRTC_Demo` 项目，选择 **Signing & Capabilities** > **Automatically manage signing** 自动生成证书<br>
+		<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_431018403c7be7bdd1d93bdf2b73236d" width="500px" >
 
-2. 登录 Apple ID。
-	
+	3.2 在 **Team** 中选择 Personal Team。<br>
+		<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_db8b76140485b9a0062377ca8b421c3d" width="500px" >
 
-2.1 选择 Xcode 页面左上角 **Xcode** > **Preferences**，或通过快捷键 **Command** + **,**  打开 Preferences。
-2.2 选择 **Accounts**，点击左下部 **+**，选择 Apple ID 进行账号登录。
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_cc2dc2681dbd59dac3a577478a25f096" width="500px" >
-
-3. 配置开发者证书。
-	
-
-3.1 单击 Xcode 左侧导航栏中的 `VeRTC_Demo` 项目，单击 `TARGETS` 下的 `VeRTC_Demo` 项目，选择 **Signing & Capabilities** > **Automatically manage signing** 自动生成证书
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_431018403c7be7bdd1d93bdf2b73236d" width="500px" >
-
-3.2 在 **Team** 中选择 Personal Team。
-
-<img src="https://lf6-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_db8b76140485b9a0062377ca8b421c3d" width="500px" >
-
-3.3 **修改 Bundle** **Identifier****。** 
-
-默认的 `vertc.veRTCDemo.ios` 已被注册， 将其修改为其他 Bundle ID，格式为 `vertc.xxx`。
-
-<img src="https://lf3-volc-editor.volccdn.com/obj/volcfe/sop-public/upload_22ed79ce436c34e32f5df83383cdcc19" width="500px" >
+	3.3 **修改 Bundle** **Identifier**。 <br>
+	默认的 `vertc.veRTCDemo.ios` 已被注册， 将其修改为其他 Bundle ID，格式为 `vertc.xxx`。<br><br>
+    <img src="https://portal.volccdn.com/obj/volcfe/cloud-universal-doc/upload_7e46256bf1f7a3dfb4cc7e5c20606c66.png" width="500px" >
 
 ### **步骤 6：编译运行**
 

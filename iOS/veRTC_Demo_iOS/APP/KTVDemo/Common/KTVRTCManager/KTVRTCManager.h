@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager reportAllAudioVolume:(NSDictionary<NSString *, NSNumber *> *_Nonnull)volumeInfo;
 
-- (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(NSString *)time;
+- (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(NSString *)json;
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager songEnds:(BOOL)result;
 

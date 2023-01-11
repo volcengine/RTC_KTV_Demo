@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)loadLrcByPath:(NSString *)filePath;
 
+- (void)updateLrcHidden:(BOOL)isHidden;
+
 /// 音频播放路由改变
 - (void)updateAudioRouteChanged;
 

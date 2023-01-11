@@ -43,8 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateUserModel:(KTVUserModel *)loginUserModel;
 
 /// Update current song progress
-/// @param songTime song progress
-- (void)updateCurrentSongTime:(NSInteger)songTime;
+/// @param json song progress
+- (void)updateCurrentSongTime:(NSString *)json;
 
 - (void)sendSongTime:(NSInteger)songTime;
 
