@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)updateSeatModel:(KTVSeatModel *)seatModel;
 
+- (void)updateLocalSeatVolume:(NSInteger)volume;
+
 - (void)updateSeatVolume:(NSDictionary *)volumeDic;
 
 - (void)updateCurrentSongModel:(KTVSongModel *)songModel;

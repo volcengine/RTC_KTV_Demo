@@ -223,9 +223,9 @@
 }
 
 - (void)rtcEngine:(ByteRTCVideo *)engine onAudioMixingPlayingProgress:(NSInteger)mixId progress:(int64_t)progress {
-        if ([self.delegate respondsToSelector:@selector(KTVRTCManager:onAudioMixingPlayingProgress:)]) {
-            [self.delegate KTVRTCManager:self onAudioMixingPlayingProgress:progress];
-        }
+    if ([self.delegate respondsToSelector:@selector(KTVRTCManager:onAudioMixingPlayingProgress:)]) {
+        [self.delegate KTVRTCManager:self onAudioMixingPlayingProgress:progress];
+    }
 }
 
 
@@ -249,6 +249,16 @@
     // Uplink network quality score
     self.paramInfoModel.txQuality = localQuality.txQuality;
     [self updateRoomParamInfoModel];
+}
+
+- (void)rtcEngine:(ByteRTCVideo *)engine onLocalAudioPropertiesReport:(NSArray<ByteRTCLocalAudioPropertiesInfo *> *)audioPropertiesInfos {
+    for (ByteRTCLocalAudioPropertiesInfo *info in audioPropertiesInfos) {
+        if (info.streamIndex == ByteRTCStreamIndexMain) {
+            if ([self.delegate respondsToSelector:@selector(KTVRTCManager:reportLocalAudioVolume:)]) {
+                [self.delegate KTVRTCManager:self reportLocalAudioVolume:info.audioPropertiesInfo.linearVolume];
+            }
+        }
+    }
 }
 
 - (void)rtcEngine:(ByteRTCVideo *)engine onRemoteAudioPropertiesReport:(NSArray<ByteRTCRemoteAudioPropertiesInfo *> *)audioPropertiesInfos totalRemoteVolume:(NSInteger)totalRemoteVolume {

@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)KTVRTCManager:(KTVRTCManager *)KTVRTCManager changeParamInfo:(KTVRoomParamInfoModel *)model;
 
+- (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager reportLocalAudioVolume:(NSInteger)volume;
+
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager reportAllAudioVolume:(NSDictionary<NSString *, NSNumber *> *_Nonnull)volumeInfo;
 
 - (void)KTVRTCManager:(KTVRTCManager *_Nonnull)KTVRTCManager onStreamSyncInfoReceived:(NSString *)json;

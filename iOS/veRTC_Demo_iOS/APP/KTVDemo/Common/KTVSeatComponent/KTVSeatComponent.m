@@ -93,6 +93,10 @@
     }
 }
 
+- (void)updateLocalSeatVolume:(NSInteger)volume {
+    [_seatView updateLocalSeatVolume:volume];
+}
+
 - (void)updateSeatVolume:(NSDictionary *)volumeDic {
     [_seatView updateSeatVolume:volumeDic];
 }

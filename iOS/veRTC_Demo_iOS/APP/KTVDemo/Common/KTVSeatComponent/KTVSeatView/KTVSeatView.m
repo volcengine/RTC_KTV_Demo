@@ -16,7 +16,9 @@ static const NSInteger MaxNumber = 6;
 
 @property (nonatomic, strong) NSMutableArray<KTVSeatItemView *> *itemViewLists;
 @property (nonatomic, strong) GCDTimer *timer;
-@property (nonatomic, copy) NSDictionary *volumeDic;
+@property (nonatomic, strong) NSMutableDictionary *volumeDic;
+@property (nonatomic, assign) NSInteger localUserVolume;
+
 @end
 
 @implementation KTVSeatView
@@ -87,8 +89,14 @@ static const NSInteger MaxNumber = 6;
     }
 }
 
+- (void)updateLocalSeatVolume:(NSInteger)volume {
+    _localUserVolume = volume;
+    [_volumeDic setValue:@(volume) forKey:[LocalUserComponent userModel].uid];
+}
+
 - (void)updateSeatVolume:(NSDictionary *)volumeDic {
-    _volumeDic = volumeDic;
+    _volumeDic = volumeDic.mutableCopy;
+    [_volumeDic setValue:@(_localUserVolume) forKey:[LocalUserComponent userModel].uid];
 }
 
 - (void)updateCurrentSongModel:(KTVSongModel *)songModel {
