@@ -1,0 +1,20 @@
+// 
+// Copyright (c) 2023 Beijing Volcano Engine Technology Ltd.
+// SPDX-License-Identifier: MIT
+// 
+
+#import <UIKit/UIKit.h>
+@class KTVSeatModel;
+@class KTVSongModel;
+
+@interface KTVSeatItemView : UIView
+
+@property (nonatomic, assign) NSInteger index;
+
+@property (nonatomic, strong) KTVSeatModel *seatModel;
+
+@property (nonatomic, copy) void (^clickBlock)(KTVSeatModel *seatModel);
+
+- (void)updateCurrentSongModel:(KTVSongModel *)songModel;
+
+@end
