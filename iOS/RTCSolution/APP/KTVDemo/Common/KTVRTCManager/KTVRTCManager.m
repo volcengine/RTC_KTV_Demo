@@ -30,7 +30,7 @@
 #pragma mark - Publish Action
 
 - (void)configeRTCEngine {
-    [self.rtcEngineKit setAudioScenario:ByteRTCAudioScenarioMusic];
+    [self.rtcEngineKit setAudioScenario:ByteRTCAudioScenarioMedia];
     [self.rtcRoom setUserVisibility:NO];
     self.paramInfoModel.rtt = @"0";
     _audioMixingID = 3001;
